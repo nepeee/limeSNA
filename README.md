@@ -13,3 +13,8 @@ Dependencies
 - webbrowser (pip)
 - gevent (pip)
 - gevent-websocket (pip)
+
+How to use:
+Install all the dependencies and run the code from a terminal with the following command:
+python sna.py
+After the radio is ready to use, the program starts a new web browser with the UI. Press the run button to start the frequeny sweep. For relative("calibrated") measurements wait a full sweep and then press the "Set relative" button.
