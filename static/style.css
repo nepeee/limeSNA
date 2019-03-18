@@ -1,0 +1,16 @@
+html, body {
+	height: 100%;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+}
+
+#panel {
+	padding: 10px;
+	line-height: 1.8;
+}
+
+#panel span {
+	display: inline-block;
+}

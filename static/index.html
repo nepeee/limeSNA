@@ -1,0 +1,33 @@
+<html>
+	<head>
+		<script src="/static/socket.io.min.js"></script>
+		<script src="/static/canvasChart.js"></script>
+		<script src="/static/functions.js"></script>
+		<link rel="stylesheet" href="/static/style.css">
+	</head>
+	<body onresize="onResize()">
+		<div id="panel">
+			<div>
+				<span>Start: <input type="text" id="startFreq" value="400" /> MHz &nbsp;</span>
+				<span>End: <input type="text" id="endFreq" value="500" /> MHz &nbsp;</span>
+				<span>Step: <input type="text" id="numSteps" value="5" />&nbsp;</span>
+				<span>Cursor mode:</span>
+				<span>
+					<input type="radio" name="cursorHold" value="0" checked="checked" onclick="setCursorMode(this)"/> Mouse
+					<input type="radio" name="cursorHold" value="1" onclick="setCursorMode(this)"/> Max hold
+					<input type="radio" name="cursorHold" value="2" onclick="setCursorMode(this)"/> Min hold
+				</span>
+			</div>
+			<div>
+				<input type="button" id="runBtn" onclick="btnClick(this)" value="Run"/>
+				<input type="button" id="setRangeBtn" onclick="btnClick(this)" value="Set range"/>
+				<input type="button" id="setRelBtn" onclick="btnClick(this)" value="Set relative"/>
+			</div>
+			<div id="welcome">
+				<h3>Welcome to limeSNA</h3>
+				Press the start button to begin.
+			</div>
+		</div>
+		<canvas id="canvas" />
+	</body>
+</html>
