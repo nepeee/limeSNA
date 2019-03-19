@@ -6,7 +6,9 @@
     var cursor = {//0 mouse, 1 max hold, 2 min hold
         mode: 0,
         x: 0,
-        y: 0
+        y: 0,
+        cutoffRange: 3,
+        showCutoff: false
     };
 
     var xMin, xRange, xMax;
@@ -22,7 +24,6 @@
 
     var canvas = document.getElementById(dataObj.canvasId);
     var ctx = canvas.getContext("2d");
-    ctx.font = '10pt Calibri';
 
     canvas.addEventListener("mousemove", setCursorPos);
 
@@ -60,7 +61,11 @@
         xRatio = xRange / (dataLength - 1);
         yRatio = yRange*-1 / vyRange;
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        //ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#222";
+
         renderLinesAndLabels();
         renderData();
         renderCursors();
@@ -70,8 +75,9 @@
         var gradCnt = 10;
 
         ctx.beginPath();
+        ctx.font = "14px 'HelveticaNeue'";
         ctx.lineWidth = 1;
-        ctx.strokeStyle = '#E8E8E8'
+        ctx.strokeStyle = '#E8E8E8';
 
         //v lines + text
         var xPos = xMin;
@@ -145,11 +151,12 @@
 
     function renderCursors() {
         ctx.beginPath();
+        ctx.font = "14px 'HelveticaNeue'";
         ctx.strokeStyle = '#FFDFBA';
         ctx.lineWidth = 1;
 
         var ptX = xMin + sweepPos * xRatio;
-        ctx.moveTo(ptX, xMin);
+        ctx.moveTo(ptX, yMin);
         ctx.lineTo(ptX, yMax);
         ctx.stroke();
         ctx.closePath();
@@ -183,7 +190,7 @@
         var pwr = dataPoints[xIndex];
 
         ctx.beginPath();
-        ctx.strokeStyle = '#000';
+        ctx.strokeStyle = '#222';
         ctx.textBaseline = 'center';
 
         var textXPos;
@@ -196,8 +203,9 @@
             textXPos = ptX - 10;
         }
 
-        if ((cursor.mode!=0) && (pwr!=null)) {
-            var bwin = getBandwidthWindow(xIndex, pwr, cursor.mode==1 ? -3 : 3);
+        var freqTextY;
+        if ((cursor.mode!=0) && (cursor.showCutoff) && (pwr!=null)) {
+            var bwin = getBandwidthWindow(xIndex, pwr, cursor.mode==1 ? cursor.cutoffRange*-1 : cursor.cutoffRange);
             var xStart = xMin + bwin.startIndex * xRatio;
             var xWidth = (xMin + bwin.endIndex * xRatio) - xStart;
             if (xWidth>0) {
@@ -207,17 +215,23 @@
 
                 var freqMin = vxMin + bwin.startIndex * vxStep;
                 var freqMax = vxMin + bwin.endIndex * vxStep;
-                ctx.fillText((freqMin/1000000).toFixed(2)+"MHz", textXPos, ptY + 15);
-                ctx.fillText((freqMax/1000000).toFixed(2)+"MHz", textXPos, ptY + 24);
+                ctx.fillText((freqMin/1000000).toFixed(2)+"MHz", textXPos, ptY + 7);
+                ctx.fillText((freqMax/1000000).toFixed(2)+"MHz", textXPos, ptY + 35);
+
+                freqTextY = ptY + 21;
             }
+            else
+                freqTextY = ptY + 7;
         }
+        else
+            freqTextY = ptY + 7;
 
         ctx.moveTo(ptX, yMin);
         ctx.lineTo(ptX, yMax);
 
         if (pwr!=null) {
-            ctx.fillText(pwr.toFixed(1)+"dB", textXPos, ptY - 6);
-            ctx.fillText((freq/1000000).toFixed(2)+"MHz", textXPos, ptY + 6);
+            ctx.fillText(pwr.toFixed(1)+"dB", textXPos, ptY - 7);
+            ctx.fillText((freq/1000000).toFixed(2)+"MHz", textXPos, freqTextY);
         }
         else
             ctx.fillText((freq/1000000).toFixed(2)+"MHz", textXPos, ptY);
@@ -289,12 +303,11 @@
         render();
     }
 
-    function getData() {
-        return dataPoints.slice(0);
-    }
-
-    function setCursorMode(mode) {
+    function setCursorMode(mode, showCutoff, cutoffRange) {
         cursor.mode = mode;
+        cursor.showCutoff = showCutoff;
+        cursor.cutoffRange = cutoffRange;
+
         render();
     }
 
@@ -308,11 +321,24 @@
         }
     }
 
+
+    function getData() {
+        return dataPoints.slice(0);
+    }
+
+    function getXRange() {
+        return {
+            min: vxMin,
+            step: vxStep
+        };
+    }
+
     return {
         init: init,
         setItem: setItem,
-        getData: getData,
         setCursorMode: setCursorMode,
+        getData: getData,
+        getXRange: getXRange,
         render: render
     };
 };

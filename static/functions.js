@@ -11,7 +11,7 @@ window.onload = function() {
 
 	chart = new CanvasChart({
 		canvasId: 'canvas',
-		margin: { top: 50, left: 50, right: 50, bottom: 50 }
+		margin: { top: 30, left: 50, right: 50, bottom: 30 }
 	});
 
 	socket = io.connect('http://' + document.domain + ':' + location.port);
@@ -63,6 +63,23 @@ function hideWelcome() {
 }
 
 function btnClick(el) {
+	if (el.id=="exportImageBtn") {
+		window.open(canvas.toDataURL('image/png'));
+		return;
+	}
+
+	if (el.id=="exportCSVBtn") {
+		var data = chart.getData();
+		var xRange = chart.getXRange();
+		var csvContent = "data:text/csv;charset=utf-8,";
+
+		for (var i=0;i<data.length;i++)
+			csvContent += ((xRange.min + i*xRange.step)/1000000).toFixed(2)+","+data[i]+"\n";
+
+		window.open(encodeURI(csvContent));
+		return;
+	}
+
 	if (el.id=="setRelBtn") {
 		if (relData==null) {
 			relData = chart.getData();
@@ -107,13 +124,22 @@ function btnClick(el) {
 }
 
 function onResize() {
-	canvas.width = document.body.offsetWidth;
-	canvas.height = document.body.offsetHeight - panel.offsetHeight;
+	canvas.width = document.body.offsetWidth  - panel.offsetWidth;
+	canvas.height = document.body.offsetHeight;
 	chart.render();
 }
 
 function setCursorMode(e) {
-	chart.setCursorMode(parseInt(e.value));
+	var cursorMode = parseInt(document.getElementById("cursoreMode").value);
+	var showCutoff = document.getElementById("showCutoff").checked;
+	var cutoffRange = Math.round(document.getElementById("cutoffRange").value);
+
+	if (cutoffRange<1) {
+		alert("The cutoff value must be greater then 0.");
+		return;
+	}
+
+	chart.setCursorMode(cursorMode, showCutoff, cutoffRange);
 }
 
 function validateInputRange(startFreq, endFreq, numSteps) {

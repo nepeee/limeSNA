@@ -4,13 +4,78 @@ html, body {
 	padding: 0;
 	margin: 0;
 	overflow: hidden;
+	color: #222;
+	font-family: "Helvetica Neue", Helvetica, Ariel, sans-serif;
+	font-size: 14px;
+}
+
+table {
+	font-size: 14px;
 }
 
 #panel {
-	padding: 10px;
-	line-height: 1.8;
+	padding: 0 10px;
+	width: 150px;
+	height: 100%; 
+	background: #F7F7F7;
+	float: left;
 }
 
-#panel span {
-	display: inline-block;
+#panel p {
+    font-size: 15px;
+	text-align: center;
+	background: #D5D9DC;
+	margin: 10px -10px;
+	padding: 5px;
 }
+
+#panel p:nth-child(1) {
+	margin-top: 0px;
+}
+
+#panel td {
+	padding: 2px 0;
+}
+
+#panel input[type="text"] {
+	text-align: right;
+	padding: 2px 5px;
+}
+
+#panel select {
+	padding: 2px 5px;
+}
+
+#radioSettings td:nth-child(1), #cursorSettings td:nth-child(1) {
+	width: 100%;
+}
+
+#radioSettings input[type="text"] {
+	width: 65px;
+}
+
+#setRangeBtn, #setRelBtn, #exportImageBtn, #exportCSVBtn {
+	width: 100%;
+	margin: 5px 0;
+}
+
+#cursorSettings select {
+	width: 90px;	
+}
+
+#cursorSettings input[type="text"] {
+	width: 65px;
+}
+
+ #runBtn {
+ 	width: 100%;
+	margin-top: 20px;
+ }
+
+ #canvas {
+ 	float: right;
+ }
+
+ #welcome h4 {
+ 	margin-bottom: 10px;
+ }
