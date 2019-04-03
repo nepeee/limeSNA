@@ -1,5 +1,6 @@
 <html>
 	<head>
+		<title>limeSNA</title>
 		<script src="/static/socket.io.min.js"></script>
 		<script src="/static/canvasChart.js"></script>
 		<script src="/static/functions.js"></script>
@@ -9,11 +10,27 @@
 		<div id="panel">
 			<p>Radio</p>
 			<table id="radioSettings">
-				<tr><td>Start:</td><td><input type="text" id="startFreq" value="400"></td><td>MHz</td></tr>
-				<tr><td>End:</td><td><input type="text" id="endFreq" value="500"></td><td>MHz</td></tr>
-				<tr><td>Step:</td><td><input type="text" id="numSteps" value="5"></td><td></td></tr>
+				<tr>
+					<td>Rate:</td>
+					<td>
+						<select id="sampleRate">
+							<option value="5">5</option>
+							<option value="10">10</option>
+							<option value="20">20</option>
+							<option value="30">30</option>
+							<option value="40">40</option>
+							<option value="50">50</option>
+							<option value="60">60</option>
+						</select>
+					</td>
+					<td>MS/s</td>
+				</tr>
+				<tr><td>Start:</td><td><input type="text" id="startFreq"></td><td>MHz</td></tr>
+				<tr><td>End:</td><td><input type="text" id="endFreq"></td><td>MHz</td></tr>
+				<tr><td>Step:</td><td><input type="text" id="numSteps"></td><td></td></tr>
 			</table>
-			<input type="button" id="setRangeBtn" onclick="btnClick(this)" value="Set range">
+			<input type="button" id="runBtn" onclick="btnClick(this)" value="Run"/>
+
 			<p>Cursor</p>
 			<table id="cursorSettings">
 				<tr>
@@ -31,13 +48,22 @@
 				</tr>
 			</table>
 
-
 			<p>Graph</p>
+			<table id="graphSettings">
+				<tr>
+					<td>Mode:</td>
+					<td colspan="2">
+						<select id="cursoreMode" onchange="setYMode(this)">
+							<option value="0" selected>dB</option>
+							<option value="1">VSWR</option>
+						</select>
+					</td>
+				</tr>
+			</table>
 			<input type="button" id="setRelBtn" onclick="btnClick(this)" value="Set relative"/>
 			<input type="button" id="exportImageBtn" onclick="btnClick(this)" value="Export image"/>
 			<input type="button" id="exportCSVBtn" onclick="btnClick(this)" value="Export data"/>
 
-			<input type="button" id="runBtn" onclick="btnClick(this)" value="Run"/>
 			<div id="welcome">
 				<h4>Welcome to limeSNA</h4>
 				Press the run button to begin.

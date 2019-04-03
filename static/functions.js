@@ -3,7 +3,6 @@ var socket;
 var welcomeHidden = false;
 var clearData = false;
 var snaConfig;
-var relData = null;
 
 window.onload = function() {
 	panel = document.getElementById("panel");
@@ -19,9 +18,12 @@ window.onload = function() {
 	socket.on('config', function(data) {
 		clearData = true;
 		snaConfig = data;
-		relData = null;
+
+		chart.setRelItems(null);
+		document.getElementById("setRelBtn").value = "Set relative";
 
 		document.getElementById("runBtn").value = snaConfig.runMode ? "Stop" : "Run";
+		document.getElementById("sampleRate").value = Math.round(snaConfig.sampleRate / 1000000);
 		document.getElementById("startFreq").value = Math.round(snaConfig.startFreq / 1000000);
 		document.getElementById("endFreq").value = Math.round(snaConfig.endFreq / 1000000);
 		document.getElementById("numSteps").value = snaConfig.numSteps;
@@ -44,12 +46,13 @@ window.onload = function() {
 	});
 
 	socket.on('data', function(data) {
-		if (relData!=null)
-			chart.setItem(data.x, data.y - relData[data.x]);
+		if (snaConfig.runMode==0)
+			return;
+
+		if (data.y instanceof Array)
+			chart.setItems(data.x, data.y);
 		else
 			chart.setItem(data.x, data.y);
-
-		//console.log(data);
 	});
 }
 
@@ -69,7 +72,7 @@ function btnClick(el) {
 	}
 
 	if (el.id=="exportCSVBtn") {
-		var data = chart.getData();
+		var data = chart.getItems();
 		var xRange = chart.getXRange();
 		var csvContent = "data:text/csv;charset=utf-8,";
 
@@ -81,45 +84,56 @@ function btnClick(el) {
 	}
 
 	if (el.id=="setRelBtn") {
-		if (relData==null) {
-			relData = chart.getData();
+		if (el.value=="Set relative") {
+			chart.setRelItems(chart.getItems());
 			el.value = "Cancel relative";
 		}
 		else {
-			relData = null;
+			chart.setRelItems(null);
 			el.value = "Set relative";
 		}
 
-		return;
-	}
+		if (snaConfig.runMode==1)
+			snaConfig.runMode = 2;
 
-	if (el.id=="runBtn") {
-		if (snaConfig.runMode==0)
+		clearData = true;
+	}
+	else if (el.id=="runBtn") {
+		var sampleRateInput = document.getElementById("sampleRate");
+		var startFreqInput = document.getElementById("startFreq");
+		var endFreqInput = document.getElementById("endFreq");
+		var numStepsInput = document.getElementById("numSteps");
+
+		if (snaConfig.runMode==0) {
+			var sampleRate = Math.round(sampleRateInput.value);
+			var startFreq = Math.round(startFreqInput.value);
+			var endFreq = Math.round(endFreqInput.value);
+			var numSteps = Math.round(numStepsInput.value);
+
+			if (!validateInputRange(startFreq, endFreq, numSteps))
+				return;
+
+			snaConfig.sampleRate = sampleRate * 1000000;
+			snaConfig.startFreq = startFreq * 1000000;
+			snaConfig.endFreq = endFreq * 1000000;
+			snaConfig.numSteps = numSteps;
+
+			clearData = true;
 			snaConfig.runMode = 1;
-		else
+		}
+		else {
 			snaConfig.runMode = 0;
+			chart.hideSweepCursor();
+		}
+
+		sampleRateInput.disabled = snaConfig.runMode==1;
+		startFreqInput.disabled = snaConfig.runMode==1;
+		endFreqInput.disabled = snaConfig.runMode==1;
+		numStepsInput.disabled = snaConfig.runMode==1;
 
 		el.value = snaConfig.runMode!=0 ? "Stop" : "Run";
 	}
-	else if (el.id=="setRangeBtn") {
-		relData = null;
-		if (snaConfig.runMode==1)
-			snaConfig.runMode = 2;
-	}
-
-	var startFreq = Math.round(document.getElementById("startFreq").value);
-	var endFreq = Math.round(document.getElementById("endFreq").value);
-	var numSteps = Math.round(document.getElementById("numSteps").value);
-
-	if (!validateInputRange(startFreq, endFreq, numSteps))
-		return;
-
-	snaConfig.startFreq = startFreq * 1000000;
-	snaConfig.endFreq = endFreq * 1000000;
-	snaConfig.numSteps = numSteps;
-
-	clearData = true;
-
+	
 	socket.emit('config', snaConfig);
 }
 
@@ -129,7 +143,7 @@ function onResize() {
 	chart.render();
 }
 
-function setCursorMode(e) {
+function setCursorMode() {
 	var cursorMode = parseInt(document.getElementById("cursoreMode").value);
 	var showCutoff = document.getElementById("showCutoff").checked;
 	var cutoffRange = Math.round(document.getElementById("cutoffRange").value);
@@ -140,6 +154,10 @@ function setCursorMode(e) {
 	}
 
 	chart.setCursorMode(cursorMode, showCutoff, cutoffRange);
+}
+
+function setYMode(e) {
+	chart.setYMode(parseInt(e.value));
 }
 
 function validateInputRange(startFreq, endFreq, numSteps) {
@@ -166,8 +184,8 @@ function validateInputRange(startFreq, endFreq, numSteps) {
 		return false;
 	}
 
-	if (numSteps<1) {
-		alert("The step count must be greater then or equal to 1.");
+	if (numSteps<2) {
+		alert("The step count must be greater then or equal to 2.");
 		return false;
 	}
 	else if (numSteps>1000) {

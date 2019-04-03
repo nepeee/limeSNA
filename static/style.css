@@ -11,6 +11,7 @@ html, body {
 
 table {
 	font-size: 14px;
+	width: 100%;
 }
 
 #panel {
@@ -46,31 +47,27 @@ table {
 	padding: 2px 5px;
 }
 
-#radioSettings td:nth-child(1), #cursorSettings td:nth-child(1) {
+#radioSettings td:nth-child(1), #cursorSettings td:nth-child(1), #graphSettings td:nth-child(1) {
 	width: 100%;
 }
 
-#radioSettings input[type="text"] {
+#radioSettings input[type="text"], #radioSettings select {
 	width: 65px;
+	margin-right: 5px;
 }
 
-#setRangeBtn, #setRelBtn, #exportImageBtn, #exportCSVBtn {
+#setRelBtn, #exportImageBtn, #exportCSVBtn, #runBtn {
 	width: 100%;
 	margin: 5px 0;
 }
 
-#cursorSettings select {
+#cursorSettings select, #graphSettings select {
 	width: 90px;	
 }
 
 #cursorSettings input[type="text"] {
 	width: 65px;
 }
-
- #runBtn {
- 	width: 100%;
-	margin-top: 20px;
- }
 
  #canvas {
  	float: right;
