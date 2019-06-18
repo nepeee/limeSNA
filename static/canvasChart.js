@@ -59,6 +59,12 @@
             }
         }
         vyRange = vyMax - vyMin;
+        if (vyRange<10) {
+            vyRange = 10;
+            var vyCenter = (vyMin + vyMax) / 2;
+            vyMin = vyCenter - vyRange/2;
+            vyMax = vyCenter + vyRange/2;
+        }
 
         xRatio = xRange / (dataLength - 1);
         yRatio = yRange*-1 / vyRange;
@@ -288,10 +294,12 @@
     }
 
     function dbToSWR(val) {
-      var r = Math.pow(10, val/20);
-      var swr = (1 + r) / (1 - r);
+        var r = Math.pow(10, val/20);
+        var swr = (1 + r) / (1 - r);
+        if ((swr>50) || (swr<0))
+            swr = 50;
 
-      return swr;
+        return swr;
     }
 
     function init(xMin, xStep, xStepCnt) {
