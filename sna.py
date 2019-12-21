@@ -1,13 +1,12 @@
 from __future__ import print_function
 import time
 import threading
-from pyLMS7002Soapy import *
+from pyLMS7002Soapy import pyLMS7002Soapy as pyLMSS
 from flask import Flask, request
 from flask_socketio import SocketIO
 import webbrowser
 
 from SingleToneSweeper import SingleToneSweeper
-#from MultiToneSweeper import MultiToneSweeper
 
 class SNA:
     RUN_MODE_OFF = 0
@@ -23,6 +22,8 @@ class SNA:
     snaStartFreq = 400e6
     snaEndFreq = 500e6
     snaNumSteps = 40
+    snaRxGain = 20
+    snaTxGain = 20
 
     def __init__(self):
         app = Flask(__name__, static_url_path='/static')
@@ -42,6 +43,8 @@ class SNA:
                 'startFreq': self.snaStartFreq,
                 'endFreq': self.snaEndFreq,
                 'numSteps': self.snaNumSteps,
+                'rxGain': self.snaRxGain,
+                'txGain': self.snaTxGain,
                 'runMode': self.snaRunMode
             })
 
@@ -51,6 +54,8 @@ class SNA:
             self.snaStartFreq = int(json['startFreq'])
             self.snaEndFreq = int(json['endFreq'])
             self.snaNumSteps = int(json['numSteps'])
+            self.snaRxGain = int(json['rxGain'])
+            self.snaTxGain = int(json['txGain'])
             self.snaRunMode = int(json['runMode'])
 
             if ((self.snaRunMode!=self.RUN_MODE_ON) and (self.sweeper is not None)):
@@ -70,10 +75,11 @@ class SNA:
             'x': index,
             'y': pwr
         })
+        self.socketio.sleep(0)
 
     def snaThread(self):
-        radio = pyLMS7002Soapy(0)
-        self.sweeper = SingleToneSweeper(radio, self.snaSampleRate, 20, 20, self)
+        radio = pyLMSS.pyLMS7002Soapy(0)
+        self.sweeper = SingleToneSweeper(radio, self)
         webbrowser.open("http://127.0.0.1:55555", new=1)
 
         while True:
@@ -85,6 +91,7 @@ class SNA:
           
             start = time.time()
 
+            self.sweeper.setGain(self.snaRxGain, self.snaTxGain)
             self.sweeper.setSampleRate(self.snaSampleRate)
             self.sweeper.sweep(self.snaStartFreq, self.snaEndFreq, self.snaNumSteps)
 

@@ -27,6 +27,8 @@ window.onload = function() {
 		document.getElementById("startFreq").value = Math.round(snaConfig.startFreq / 1000000);
 		document.getElementById("endFreq").value = Math.round(snaConfig.endFreq / 1000000);
 		document.getElementById("numSteps").value = snaConfig.numSteps;
+		document.getElementById("rxGain").value = snaConfig.rxGain;
+		document.getElementById("txGain").value = snaConfig.txGain;
 
 		if (snaConfig.runMode==1) { //restart sweep
 			snaConfig.runMode = 2;
@@ -103,12 +105,16 @@ function btnClick(el) {
 		var startFreqInput = document.getElementById("startFreq");
 		var endFreqInput = document.getElementById("endFreq");
 		var numStepsInput = document.getElementById("numSteps");
+		var rxGainInput = document.getElementById("rxGain");
+		var txGainInput = document.getElementById("txGain");
 
 		if (snaConfig.runMode==0) {
 			var sampleRate = Math.round(sampleRateInput.value);
 			var startFreq = Math.round(startFreqInput.value);
 			var endFreq = Math.round(endFreqInput.value);
 			var numSteps = Math.round(numStepsInput.value);
+			var rxGain = Math.round(rxGainInput.value);
+			var txGain = Math.round(txGainInput.value);
 
 			if (!validateInputRange(startFreq, endFreq, numSteps))
 				return;
@@ -117,6 +123,8 @@ function btnClick(el) {
 			snaConfig.startFreq = startFreq * 1000000;
 			snaConfig.endFreq = endFreq * 1000000;
 			snaConfig.numSteps = numSteps;
+			snaConfig.rxGain = rxGain;
+			snaConfig.txGain = txGain;
 
 			clearData = true;
 			snaConfig.runMode = 1;
@@ -130,6 +138,8 @@ function btnClick(el) {
 		startFreqInput.disabled = snaConfig.runMode==1;
 		endFreqInput.disabled = snaConfig.runMode==1;
 		numStepsInput.disabled = snaConfig.runMode==1;
+		rxGainInput.disabled = snaConfig.runMode==1;
+		txGainInput.disabled = snaConfig.runMode==1;
 
 		el.value = snaConfig.runMode!=0 ? "Stop" : "Run";
 	}

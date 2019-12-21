@@ -151,6 +151,8 @@
             }
             else
                 ctx.lineTo(ptX, ptY);
+
+            //ctx.fillRect(ptX-5, ptY-5, 10, 10); 
         }
 
         ctx.stroke();
