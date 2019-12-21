@@ -11,9 +11,9 @@ For a 400-500MHz sweep with 200 data points(10 point/5MHz), the sweep time is ab
 Dependencies
 - pyLMS7002Soapy Python package: https://github.com/myriadrf/pyLMS7002Soapy
 - numpy (pip)
+- scipy (pip)
 - flask (pip)
 - flask_socketio (pip)
-- webbrowser (pip)
 - gevent (pip)
 - gevent-websocket (pip)
 
